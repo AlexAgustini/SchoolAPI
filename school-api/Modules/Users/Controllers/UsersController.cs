@@ -20,15 +20,15 @@ public class UsersController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<ActionResult<List<User>>> FindAll()
+    public async Task<ActionResult<List<UserDto>>> FindAll()
     {
-        return await _usersService.FindAll();
+        return Ok(await _usersService.FindAll());
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<User>> FindOne(int id)
     {
-        return await _usersService.FindOne(id);
+        return Ok(await _usersService.FindOne(id));
     }
 
     [HttpPost]

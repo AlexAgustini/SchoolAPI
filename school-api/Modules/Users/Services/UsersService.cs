@@ -15,7 +15,7 @@ public class UsersService
         _usersRepository = usersRepository;
     }
     
-    public async Task<List<User>> FindAll()
+    public async Task<List<UserDto>> FindAll()
     {
         return await _usersRepository.FindAll();
     } 

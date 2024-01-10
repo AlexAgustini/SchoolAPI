@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SchoolAPI.Modules.Core.Database;
 using SchoolAPI.Modules.Core.Exceptions;
 using SchoolAPI.Modules.Users.Dtos;
+using SchoolAPI.Modules.Users.Extensions;
 using SchoolAPI.Modules.Users.Models;
 
 namespace SchoolAPI.Modules.Users.Repositories;
@@ -16,10 +17,11 @@ public class UsersRepository
         _dataContext = dataContext;
     }
 
-    public async Task<List<User>> FindAll()
+    public async Task<List<UserDto>> FindAll()
     {
         var users = await _dataContext.Users.ToListAsync();
-        return users;
+
+        return users.Select(user => user.ToUserDto()).ToList();
     }
 
     public async Task<User> FindOne(int id)
