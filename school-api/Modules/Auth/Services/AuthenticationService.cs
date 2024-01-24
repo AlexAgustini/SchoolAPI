@@ -2,10 +2,12 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;  
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Extensions;
 using school;
 using SchoolAPI.Modules.Auth.Dtos;
 using SchoolAPI.Modules.Users.Dtos;
 using SchoolAPI.Modules.Users.Extensions;
+using SchoolAPI.Modules.Users.Models;
 using SchoolAPI.Modules.Users.Repositories;
 
 namespace SchoolAPI.Modules.Auth.Services;
@@ -13,10 +15,12 @@ namespace SchoolAPI.Modules.Auth.Services;
 public class AuthenticationService
 {
     private readonly UsersRepository _usersRepository;
+    private readonly IConfiguration _configuration;
 
-    public AuthenticationService(UsersRepository usersRepository)
+    public AuthenticationService(UsersRepository usersRepository, IConfiguration configuration)
     {
         _usersRepository = usersRepository;
+        _configuration = configuration;
     }
 
 
@@ -30,24 +34,27 @@ public class AuthenticationService
             throw new UnauthorizedException();
         }
 
-        var token = GenerateToken();
+        var token = GenerateToken(user);
 
         return new UserTokenResult(user.ToUserDto(), token);
     }
     
-    private static string GenerateToken()
+    private string GenerateToken(User user)
     {
 
+        var userRole = user.Role.GetDisplayName();
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes("djasiodjiosajdsiodjisodjsoijdasodjoadjdodoaidj");
+        var key = Encoding.ASCII.GetBytes(_configuration.GetValue<string>("JwtSecret")!);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(new Claim[]
             {
-                new Claim(ClaimTypes.Role, "Admin", ""),
-                new Claim(ClaimTypes.Role, "AdminMaster"),
+                new Claim(ClaimTypes.Sid, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Name),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, userRole),
             }),
-            Expires = DateTime.UtcNow.AddHours(2),
+            Expires = DateTime.UtcNow.AddHours(1),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
         var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -56,3 +63,5 @@ public class AuthenticationService
 }
 
 public record UserTokenResult(UserDto User, string Token);
+
+

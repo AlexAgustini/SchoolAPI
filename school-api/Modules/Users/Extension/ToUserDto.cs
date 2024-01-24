@@ -9,9 +9,11 @@ public static class ToUserDtoExtension
     {
         return new UserDto()
         {
+            Id = user.Id,
             Name = user.Name,
             Email = user.Email,
-            TeacherId = user.TeacherId
+            TeacherId = user.TeacherId,
+            Role = user.Role
         };
     }
 }

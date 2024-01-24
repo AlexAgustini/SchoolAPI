@@ -10,7 +10,6 @@ namespace SchoolAPI.Modules.Core.Database;
 public class DataContext : DbContext
 {
     public DbSet<Teacher> Teachers { get; set; }
-    
     public DbSet<Student> Students { get; set; }
     public DbSet<Exam> Exams { get; set; }
     public DbSet<Course> Courses { get; set; }

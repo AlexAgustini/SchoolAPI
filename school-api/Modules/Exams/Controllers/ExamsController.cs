@@ -1,12 +1,15 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SchoolAPI.Modules.Auth.Attributes;
+using SchoolAPI.Modules.Core.Exceptions;
 using SchoolAPI.Modules.Exams.Dtos;
 using SchoolAPI.Modules.Exams.Models;
 using SchoolAPI.Modules.Exams.Services;
+using SchoolAPI.Modules.Users.Enums;
 
 namespace SchoolAPI.Modules.Exams.Controllers;
 
-[Authorize]
 [Route("exams")]
 [ApiController]
 public class ExamsController : ControllerBase
@@ -25,10 +28,17 @@ public class ExamsController : ControllerBase
         return await _examsService.FindAll();
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public async Task<ActionResult<Exam>> FindOne(int id)
     {
-        return await _examsService.FindOne(id);
+        var exam = await _examsService.FindOne(id);
+
+        if (exam is null)
+        {
+            throw new NotFoundException();
+        }
+
+        return exam;
     }
 
     [HttpPost]
@@ -45,6 +55,7 @@ public class ExamsController : ControllerBase
         return Ok(updatedExam);
     }
 
+    [AuthorizeRoles(UserRoleEnum.Admin)]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -52,3 +63,4 @@ public class ExamsController : ControllerBase
         return NoContent();
     }
 }
+

@@ -18,7 +18,7 @@ public class CoursesService
     {
         return await _coursesRepository.FindAll();
     } 
-    public async Task<Course> FindOne(int id)
+    public async Task<Course?> FindOne(int id)
     {
         return await _coursesRepository.FindOne(id);
     } 
@@ -26,7 +26,7 @@ public class CoursesService
     {
         return await _coursesRepository.Create(course);
     } 
-    public async Task<Course> Update(int id, UpdateCourseDto course)
+    public async Task<Course?> Update(int id, UpdateCourseDto course)
     {
         return await _coursesRepository.Update(id, course); 
     } 

@@ -11,7 +11,7 @@ public class Student
     public string Email { get; set; }
     public int Age { get; set; }
 
-    public List<Course> Courses { get; } = [];
+    public ICollection<Course?> Courses { get; } = [];
 
 
 }

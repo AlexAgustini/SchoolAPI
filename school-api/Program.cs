@@ -13,7 +13,7 @@ builder.Services.RegisterControllersConfig();
 builder.Services.RegisterSwaggerConfig();
 builder.Services.ConfigureDependencies();
 builder.Services.RegisterDbContext(builder.Configuration);
-builder.Services.AddJwtAuthentication();
+builder.Services.AddJwtAuthentication(builder.Configuration.GetValue<string>("JwtSecret")!);
 
 var app = builder.Build();
 

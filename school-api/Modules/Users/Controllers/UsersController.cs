@@ -1,5 +1,7 @@
+using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SchoolAPI.Modules.Core.Exceptions;
 using SchoolAPI.Modules.Users.Dtos;
 using SchoolAPI.Modules.Users.Models;
 using SchoolAPI.Modules.Users.Services;
@@ -26,7 +28,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<User>> FindOne(int id)
+    public async Task<ActionResult<UserDto>> FindOne(int id)
     {
         return Ok(await _usersService.FindOne(id));
     }
@@ -34,12 +36,20 @@ public class UsersController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<User>> Insert(CreateUserDto user)
     {
-        var createdUser = await _usersService.Create(user);
+
+        var loggedUser = User;
+        var createdUser = await _usersService.Create(user, loggedUser);
         return CreatedAtAction(nameof(Insert), new { id = createdUser.Id }, createdUser);
     }
 
-    [HttpPut("{id}")]
-    public async Task<ActionResult<User>> Update(int id, UpdateUserDto user)
+    [HttpPatch("${id:int}/change-password")]
+    public async Task<IActionResult> ChangePassword(int id, ChangePasswordDto data)
+    {
+        return await _usersService.ChangePassword(id, data) ? NoContent() : throw new NotFoundException();
+    }
+
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult<UserDto>> Update(int id, UpdateUserDto user)
     {
         var updatedUser = await _usersService.Update(id, user);
         return Ok(updatedUser);

@@ -17,7 +17,7 @@ public class TeachersService
     {
         return await _teachersRepository.FindAll();
     } 
-    public async Task<Teacher> FindOne(int id)
+    public async Task<Teacher?> FindOne(int id)
     {
         return await _teachersRepository.FindOne(id);
     } 

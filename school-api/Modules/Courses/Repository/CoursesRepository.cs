@@ -21,15 +21,14 @@ public class CoursesRepository
         return courses;
     }
 
-    public async Task<Course> FindOne(int id)
+    public async Task<Course?> FindOne(int id)
     {
-        var courses = await _dataContext.Courses
+        var course = await _dataContext.Courses
+            .Include(c=> c.Teacher)
+            .Include(c=> c.Students)
             .FirstOrDefaultAsync(b=> b.Id ==id);
-        if (courses is null)
-        {
-            throw new NotFoundException();
-        }
-        return courses;
+        
+        return course;
     }
 
     public async Task<Course> Create(CreateCourseDto course)
@@ -49,11 +48,16 @@ public class CoursesRepository
         return newCourse;
     }
 
-    public async Task<Course> Update(int id, UpdateCourseDto course)
+    public async Task<Course?> Update(int id, UpdateCourseDto course)
     {
         var dbCourse = await FindOne(id);
+
+        if (dbCourse is null)
+        {
+            throw new NotFoundException();
+        }
         
-            _dataContext.Entry(dbCourse).CurrentValues.SetValues(course);
+        _dataContext.Entry(dbCourse).CurrentValues.SetValues(course);
         
         await _dataContext.SaveChangesAsync();
         return dbCourse;
@@ -62,6 +66,12 @@ public class CoursesRepository
     public async Task<bool> Delete(int id)
     {
         var dbCourse = await FindOne(id);
+        
+        if (dbCourse is null)
+        {
+            throw new NotFoundException();
+        }
+        
         _dataContext.Remove(dbCourse);
         return await _dataContext.SaveChangesAsync() > 0;
     }

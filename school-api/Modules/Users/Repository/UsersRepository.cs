@@ -26,13 +26,14 @@ public class UsersRepository
 
     public async Task<User> FindOne(int id)
     {
-        var users = await _dataContext.Users
+        var user = await _dataContext.Users
             .FirstOrDefaultAsync(b=> b.Id ==id);
-        if (users is null)
+        if (user is null)
         {
             throw new NotFoundException();
         }
-        return users;
+
+        return user;
     }
     public async Task<User?> FindOneByEmail(string email)
     {
@@ -41,7 +42,7 @@ public class UsersRepository
         return user;
     }
 
-    public async Task<User> Create(CreateUserDto user)
+    public async Task<UserDto> Create(CreateUserDto user)
     {
 
         var newUser = new User()
@@ -49,25 +50,43 @@ public class UsersRepository
             Name = user.Name,
             Email = user.Email,
             TeacherId = user.TeacherId,
-            Hash = user.Password
+            Role = user.Role,
+            Hash = user.Password,
         };
         
         
         _dataContext.Users.Add(newUser);
         await _dataContext.SaveChangesAsync();
 
-        return newUser;
+        return newUser.ToUserDto();
     }
 
-    public async Task<User> Update(int id, UpdateUserDto user)
+    public async Task<UserDto> Update(int id, UpdateUserDto user)
     {
-        var dbUser = await FindOne(id);
+
+        await _dataContext.Users
+            .Where(u=> u.Id == id)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(u => u.Name, user.Name)
+                .SetProperty(u => u.Email, user.Email)
+                .SetProperty(u => u.TeacherId, user.TeacherId)
+                .SetProperty(u => u.Role, user.Role)
+            );
         
-        _dataContext.Entry(dbUser).CurrentValues.SetValues(user);
-        
-        await _dataContext.SaveChangesAsync();
-        return dbUser;
+        return (await FindOne(id)).ToUserDto();
     }
+    
+    public async Task<bool> ChangePassword(int id, string newHash)
+    {
+        var affectedRows= await _dataContext.Users
+            .Where(u=> u.Id == id)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(u => u.Hash, newHash)
+            );
+
+        return affectedRows > 0;
+    }
+
     
     public async Task<bool> Delete(int id)
     {

@@ -3,6 +3,7 @@ using SchoolAPI.Modules.Students.Dtos;
 using SchoolAPI.Modules.Students.Models;
 using SchoolAPI.Modules.Core.Database;
 using SchoolAPI.Modules.Core.Exceptions;
+using SchoolAPI.Modules.Courses.Models;
 using SchoolAPI.Modules.Courses.Repositories;
 
 namespace SchoolAPI.Modules.Students.Repositories;
@@ -22,6 +23,7 @@ public class StudentsRepository
     public async Task<List<Student>> FindAll()
     {
         var students = await _dataContext.Students
+            .Include(s=> s.Courses)
             .ToListAsync();
         return students;
     }

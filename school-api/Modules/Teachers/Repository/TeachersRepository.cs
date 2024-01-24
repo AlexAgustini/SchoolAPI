@@ -17,18 +17,18 @@ public class TeachersRepository
 
     public async Task<List<Teacher>> FindAll()
     {
-        var teachers = await _dataContext.Teachers.ToListAsync();
+        var teachers = await _dataContext.Teachers
+            .Include(t=> t.Courses)
+            .ToListAsync();
         return teachers;
     }
 
-    public async Task<Teacher> FindOne(int id)
+    public async Task<Teacher?> FindOne(int id)
     {
         var teacher = await _dataContext.Teachers
-            .FirstOrDefaultAsync(b=> b.Id ==id);
-        if (teacher is null)
-        {
-            throw new NotFoundException();
-        }
+            .Include(t => t.Courses)
+            .FirstOrDefaultAsync(t => t.Id == id);
+
         return teacher;
     }
 
@@ -39,7 +39,6 @@ public class TeachersRepository
             Name = teacher.Name,
             Age = teacher.Age,
             Email = teacher.Email,
-            Courses = teacher.Courses
         };
         
         
@@ -52,8 +51,12 @@ public class TeachersRepository
     public async Task<Teacher> Update(int id, CreateTeacherDto createTeacher)
     {
         var dbTeacher = await FindOne(id);
+        if (dbTeacher is null)
+        {
+            throw new NotFoundException();
+        }
         
-            _dataContext.Entry(dbTeacher).CurrentValues.SetValues(createTeacher);
+        _dataContext.Entry(dbTeacher).CurrentValues.SetValues(createTeacher);
         
         await _dataContext.SaveChangesAsync();
         return dbTeacher;
@@ -62,6 +65,11 @@ public class TeachersRepository
     public async Task<Teacher> Delete(int id)
     {
         var dbTeacher = await FindOne(id);
+
+        if (dbTeacher is null)
+        {
+            throw new NotFoundException();
+        }
         _dataContext.Remove(dbTeacher);
         await _dataContext.SaveChangesAsync();
         return dbTeacher;

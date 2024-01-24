@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SchoolAPI.Modules.Core.Exceptions;
 using SchoolAPI.Modules.Teachers.Dto;
 using SchoolAPI.Modules.Teachers.Models;
 using SchoolAPI.Modules.Teachers.Services;
@@ -28,7 +29,13 @@ public class TeachersController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<Teacher>> FindOne(int id)
     {
-        return await _teachersService.FindOne(id);
+        var teacher = await _teachersService.FindOne(id);
+        if (teacher is null)
+        {
+            throw new NotFoundException();
+        }
+
+        return teacher;
     }
 
     [HttpPost]

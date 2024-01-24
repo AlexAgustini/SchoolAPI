@@ -6,30 +6,27 @@ using SchoolAPI.Modules.Exams.Models;
 
 namespace SchoolAPI.Modules.Exams.Repositories;
 
-public class ExamsRepository
+public class ExamsRepository(
+    DataContext dataContext
+    )
 {
-    private readonly DataContext _dataContext;
-    
-    public ExamsRepository(DataContext dataContext)
-    {
-        _dataContext = dataContext;
-    }
-
     public async Task<List<Exam>> FindAll()
     {
-        var exams = await _dataContext.Exams.ToListAsync();
+        var exams = await dataContext.Exams
+            .Include((e=> e.Course))
+            .Include((e=> e.Teacher))
+            .ToListAsync();
         return exams;
     }
 
-    public async Task<Exam> FindOne(int id)
+    public async Task<Exam?> FindOne(int id)
     {
-        var exams = await _dataContext.Exams
+        var exam = await dataContext.Exams
+            .Include((e=> e.Course))
+            .Include((e=> e.Teacher))
             .FirstOrDefaultAsync(b=> b.Id ==id);
-        if (exams is null)
-        {
-            throw new NotFoundException();
-        }
-        return exams;
+        
+        return exam;
     }
 
     public async Task<Exam> Create(CreateExamDto createExam)
@@ -40,29 +37,40 @@ public class ExamsRepository
             TeacherId = createExam.TeacherId,
             CourseId = createExam.CourseId
         };
+
         
         
-        _dataContext.Exams.Add(newExam);
-        await _dataContext.SaveChangesAsync();
+        dataContext.Exams.Add(newExam);
+        await dataContext.SaveChangesAsync();
 
         return newExam;
     }
 
-    public async Task<Exam> Update(int id, UpdateExamDto createExam)
+    public async Task<Exam?> Update(int id, UpdateExamDto createExam)
     {
         var dbExam = await FindOne(id);
+
+        if (dbExam is null)
+        {
+            throw new NotFoundException();
+        }
+
+        dataContext.Entry(dbExam).CurrentValues.SetValues(createExam);
         
-            _dataContext.Entry(dbExam).CurrentValues.SetValues(createExam);
-        
-        await _dataContext.SaveChangesAsync();
+        await dataContext.SaveChangesAsync();
         return dbExam;
     }
     
     public async Task<bool> Delete(int id)
     {
         var dbExam = await FindOne(id);
-        _dataContext.Remove(dbExam);
-        return await _dataContext.SaveChangesAsync() > 0;
+        
+        if (dbExam is null)
+        {
+            throw new NotFoundException();
+        }
+        dataContext.Remove(dbExam);
+        return await dataContext.SaveChangesAsync() > 0;
     }
 
 }
