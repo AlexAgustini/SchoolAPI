@@ -33,6 +33,7 @@ public class UsersController : ControllerBase
         return Ok(await _usersService.FindOne(id));
     }
 
+    [AllowAnonymous]
     [HttpPost]
     public async Task<ActionResult<User>> Insert(CreateUserDto user)
     {
