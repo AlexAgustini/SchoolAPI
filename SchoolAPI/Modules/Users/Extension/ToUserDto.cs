@@ -12,7 +12,6 @@ public static class ToUserDtoExtension
             Id = user.Id,
             Name = user.Name,
             Email = user.Email,
-            TeacherId = user.TeacherId,
             Role = user.Role
         };
     }

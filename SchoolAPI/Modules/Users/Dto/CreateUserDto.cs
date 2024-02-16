@@ -29,7 +29,5 @@ public class CreateUserDto
     [ValidEnum]
     public UserRoleEnum Role { get; set; }
     
-    [Required]
-    public int? TeacherId { get; set; }
 }
 

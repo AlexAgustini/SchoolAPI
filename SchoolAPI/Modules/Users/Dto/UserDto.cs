@@ -12,5 +12,4 @@ public class UserDto
     
     public required UserRoleEnum Role { get; set; }
     
-    public int? TeacherId { get; set; }
 }

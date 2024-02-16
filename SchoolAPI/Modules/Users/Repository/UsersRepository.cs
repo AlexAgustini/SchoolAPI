@@ -49,7 +49,6 @@ public class UsersRepository
         {
             Name = user.Name,
             Email = user.Email,
-            TeacherId = user.TeacherId,
             Role = user.Role,
             Hash = user.Password,
         };
@@ -69,7 +68,6 @@ public class UsersRepository
             .ExecuteUpdateAsync(setters => setters
                 .SetProperty(u => u.Name, user.Name)
                 .SetProperty(u => u.Email, user.Email)
-                .SetProperty(u => u.TeacherId, user.TeacherId)
                 .SetProperty(u => u.Role, user.Role)
             );
         

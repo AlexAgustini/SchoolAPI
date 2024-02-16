@@ -32,22 +32,6 @@ public class UsersService
     } 
     public async Task<UserDto> Create(CreateUserDto user, ClaimsPrincipal loggedUser)
     {
-        var loggedUserRole = (int) Enum.Parse(typeof(UserRoleEnum), loggedUser.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value!);
-        
-        if ((int) user.Role > loggedUserRole)
-        {
-            throw new ForbiddenException("You can't create a user with a role greater than yours!");
-        }
-
-        if (user.TeacherId is not null)
-        {
-            var teacher = await _teachersService.FindOne((int) user.TeacherId);
-            if (teacher is null)
-            {
-                throw new NotFoundException(message: "Teacher not found");
-            }
-        }
-        
         user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
         
         return await _usersRepository.Create(user);

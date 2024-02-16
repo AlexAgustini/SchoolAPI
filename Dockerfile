@@ -20,4 +20,4 @@ RUN dotnet publish "SchoolAPI.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "SchoolAPI.dll"]
+ENTRYPOINT ["dotnet", "SchoolAPI.dll", "--environment=development"]

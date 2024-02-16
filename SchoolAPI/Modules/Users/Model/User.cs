@@ -11,7 +11,6 @@ public class User
     public string Email { get; set; }
 
     public UserRoleEnum Role { get; set; }
-    public int? TeacherId { get; set; }
 
 }
 

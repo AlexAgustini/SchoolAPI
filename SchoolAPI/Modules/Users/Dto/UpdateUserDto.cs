@@ -15,5 +15,4 @@ public class UpdateUserDto
     [JsonProperty(Required = Required.Always)]
     [ValidEnum]
     public UserRoleEnum Role { get; set; }
-    public int TeacherId { get; set; }
 }

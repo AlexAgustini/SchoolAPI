@@ -17,7 +17,7 @@ public class CustomHttpExceptionFilter : IExceptionFilter
                 {
                     StatusCode = (int)customException.StatusCode,
                     Message = customException.Message
-                });
+                })  {StatusCode = (int) customException.StatusCode};
                 context.ExceptionHandled = true;
                 break;
             case SqlException:
@@ -25,7 +25,7 @@ public class CustomHttpExceptionFilter : IExceptionFilter
                 {
                     StatusCode = HttpStatusCode.InternalServerError,
                     Message =  "Database error"
-                });
+                })  {StatusCode = (int) HttpStatusCode.InternalServerError};
                 break;
             default:
                 System.Diagnostics.Debug.WriteLine("LAST QUERY");
@@ -35,7 +35,7 @@ public class CustomHttpExceptionFilter : IExceptionFilter
                 {
                     StatusCode = HttpStatusCode.InternalServerError,
                     Message =  "Internal server error"
-                });
+                }) {StatusCode = (int) HttpStatusCode.InternalServerError};
                 break;
         }
     }
